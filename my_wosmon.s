@@ -29,12 +29,12 @@ RESET:
     CLD             ; Clear decimal arithmetic mode.
     CLI
     LDY #$7F        ; Mask for DSP data direction register.
-    ;STY DSP         ; Set it up.
+    STY DSP         ; Set it up.
     LDA #$A7        ; KBD and DSP control register mask.
-    ;STA KBDCR       ; Enable interrupts, set CA1, CB1, for
-    ;STA DSPCR       ;  positive edge sense/output mode.
+    STA KBDCR       ; Enable interrupts, set CA1, CB1, for
+    STA DSPCR       ;  positive edge sense/output mode.
 NOTCR:
-    CMP #'_'+$80    ; "_"?
+    CMP #$7F+$80    ; backspace "_"?
     BEQ BACKSPACE   ; Yes.
     CMP #$9B        ; ESC?
     BEQ ESCAPE      ; Yes.
@@ -179,7 +179,6 @@ ECHO:
     BRK             ; unused
 
 ; Interrupt Vectors
-    .org  $FFFA
     .word $0F00     ; NMI
     .word RESET     ; RESET
     .word $0000     ; BRK/IRQ

@@ -58,49 +58,39 @@ void write6502(uint16_t address, uint8_t value){
     memory[address] = value;
 }
 
+void load_prog(){
+    FILE *fptr;
+    fptr = fopen("prog.bin", "rb");
+    fread(memory + 0x1200, 100, 1, fptr);
+}
+
 void read_file(){
    FILE *fptr;
    fptr = fopen("a.out", "rb");
    fread(memory, sizeof(memory), 1, fptr);
 }
 
+void save_file(){
+    FILE *fptr;
+    fptr = fopen("a.out", "wb");
+    fwrite(memory, sizeof(memory), 1, fptr);
+}
+
 int main(){
-    /*
-    memset(memory, 0xEA, 1<<16);
-    memory[0xFFFC] = 0x00;
-    memory[0xFFFD] = 0x80;
-    uint8_t prog[] = {
-        0xA9, 'H', 0x8D, 0x00, 0x60,
-        0xA9, 'e', 0x8D, 0x00, 0x60,
-        0xA9, 'l', 0x8D, 0x00, 0x60,
-        0x8D, 0x00, 0x60,
-        0xA9, 'o', 0x8D, 0x00, 0x60,
-        0xA9, ' ', 0x8D, 0x00, 0x60,
-        0xA9, 'w', 0x8D, 0x00, 0x60,
-        0xA9, 'o', 0x8D, 0x00, 0x60,
-        0xA9, 'r', 0x8D, 0x00, 0x60,
-        0xA9, 'l', 0x8D, 0x00, 0x60,
-        0xA9, 'd', 0x8D, 0x00, 0x60,
-        0xA9,'\n', 0x8D, 0x00, 0x60
-    };
-    */
     set_nonblocking_input();
     read_file();
+    load_prog();
 
     reset6502();
-    //for(int i = 0; i < sizeof(prog)/sizeof(uint8_t); ++i){
-    //    memory[0x8000+i] = prog[i];
-    //}a
     for(;;){
         step6502();
         usleep(100);
+        char ch = getchar();
+        if (ch == 'q'){
+            save_file();
+        }
+        ungetc(ch, stdin);
     }
-    //char inp = getchar();
-    //puts("\033[1A\033[2K");
-    //if (inp == 'q'){
-    //    break;
-    //}
-    //step6502();
     reset_input_mode();
     return 0;
 }
