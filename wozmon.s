@@ -1,7 +1,7 @@
 ;  The WOZ Monitor for the Apple 1
 ;  Written by Steve Wozniak in 1976
 
-
+    BRK
 ; Page 0 Variables
 
     XAML            = $24           ;  Last "opened" location Low
@@ -34,7 +34,7 @@ RESET:
     STA KBDCR       ; Enable interrupts, set CA1, CB1, for
     STA DSPCR       ;  positive edge sense/output mode.
 NOTCR:
-    CMP #'_'+$80    ; "_"?
+    CMP #$7F+$80    ; backspace "_"?
     BEQ BACKSPACE   ; Yes.
     CMP #$9B        ; ESC?
     BEQ ESCAPE      ; Yes.
@@ -44,7 +44,7 @@ ESCAPE:
     LDA #'\'+$80    ; "\".
     JSR ECHO        ; Output it.
 GETLINE:
-    LDA #$8D        ; CR.
+    LDA #$8A        ; CR.
     JSR ECHO        ; Output it.
     LDY #$01        ; Initialize text index.
 BACKSPACE:
@@ -56,7 +56,7 @@ NEXTCHAR:
     LDA KBD         ; Load character. B7 should be ‘1’.
     STA IN,Y        ; Add to text buffer.
     JSR ECHO        ; Display character.
-    CMP #$8D        ; CR?
+    CMP #$8A        ; CR?
     BNE NOTCR       ; No.
     LDY #$FF        ; Reset text index.
     LDA #$00        ; For XAM mode.
@@ -69,7 +69,7 @@ BLSKIP:
     INY             ; Advance text index.
 NEXTITEM:
     LDA IN,Y        ; Get character.
-    CMP #$8D        ; CR?
+    CMP #$8A        ; CR?
     BEQ GETLINE     ; Yes, done this line.
     CMP #'.'+$80    ; "."?
     BCC BLSKIP      ; Skip delimiter.
@@ -128,7 +128,7 @@ SETADR:
     BNE SETADR      ; Loop unless X=0.
 NXTPRNT:
     BNE PRDATA      ; NE means no address to print.
-    LDA #$8D        ; CR.
+    LDA #$8A        ; CR.
     JSR ECHO        ; Output it.
     LDA XAMH        ; ‘Examine index’ high-order byte.
     JSR PRBYTE      ; Output it in hex format.
@@ -170,7 +170,7 @@ PRHEX:
     BCC ECHO        ; Yes, output it.
     ADC #$06        ; Add offset for letter.
 ECHO:
-    BIT DSP         ; DA bit (B7) cleared yet?
+    BIT DSPCR        ; DA bit (B7) cleared yet?
     BMI ECHO        ; No, wait for display.
     STA DSP         ; Output character. Sets DA.
     RTS             ; Return.
@@ -179,7 +179,6 @@ ECHO:
     BRK             ; unused
 
 ; Interrupt Vectors
-
     .word $0F00     ; NMI
     .word RESET     ; RESET
     .word $0000     ; BRK/IRQ

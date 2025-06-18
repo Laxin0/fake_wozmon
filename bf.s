@@ -8,6 +8,7 @@ ECHO   = $FFEF
 
     lda #$8A
     jsr ECHO
+
     ldy #0
 nextchar:
     lda KBDCR
