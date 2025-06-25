@@ -66,7 +66,7 @@ void load_prog(){
 
 void read_file(){
    FILE *fptr;
-   fptr = fopen("a.out", "rb");
+   fptr = fopen("./build/wozmon.bin", "rb");
    fread(memory, sizeof(memory), 1, fptr);
 }
 
@@ -79,7 +79,7 @@ void save_file(){
 int main(){
     set_nonblocking_input();
     read_file();
-    load_prog();
+    //load_prog();
 
     reset6502();
     for(;;){
