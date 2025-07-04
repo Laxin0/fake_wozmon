@@ -22,11 +22,11 @@
     DSP             = $D012         ;  PIA.B display output register
     DSPCR           = $D013         ;  PIA.B display control register
 
-    .org $1200
-
-    lda #'h'
-    jsr ECHO
-    jmp RESET
+   ; .org $1200
+   ; .include "hello.s"
+    
+    .org $1300
+    .include "bf.s"
 
     .org $FF00
     ;.export RESET

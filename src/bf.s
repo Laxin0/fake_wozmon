@@ -1,10 +1,11 @@
 SRC    = $1000
 TAPE   = $1100
-KBD    = $D010         ;  PIA.A keyboard input
-KBDCR  = $D011         ;  PIA.A keyboard control register
-DSP    = $D012         ;  PIA.B display output register
-DSPCR  = $D013         ;  PIA.B display control register
-ECHO   = $FFEF
+NESTL  = $10
+;KBD    = $D010         ;  PIA.A keyboard input
+;KBDCR  = $D011         ;  PIA.A keyboard control register
+;DSP    = $D012         ;  PIA.B display output register
+;DSPCR  = $D013         ;  PIA.B display control register
+;ECHO   = $FFEF
 
     lda #$8A
     jsr ECHO
@@ -13,46 +14,67 @@ ECHO   = $FFEF
 nextchar:
     lda KBDCR
     bpl nextchar
+
     lda KBD
     sta SRC,Y
     iny
     jsr ECHO
-    cmp #$8A
+    
+    cmp #$8A        ; \n ?
     bne nextchar
+
     ldx 0
     ldy 0
 nextbf:
     lda SRC,Y
     iny
-plus:
+    ;jsr ECHO
+
     cmp #'+'+$80
-    bne minus
-    lda #'P'+$80
-    jsr ECHO
-    inc TAPE,X
-minus:
+    beq plus
     cmp #'-'+$80
-    bne right
-    lda #'M'+$80
-    jsr ECHO
-    dec TAPE,X
-right:
-    cmp #'>'+$80
-    bne left
-    lda #'R'+$80
-    jsr ECHO
-    inx
-left:
+    beq minus
     cmp #'<'+$80
-    bne nextbf
-    lda #'L'+$80
-    jsr ECHO
-    dex
-    
+    beq left
+    cmp #'>'+$80
+    beq right
+    cmp #'.'+$80
+    beq dot
+    cmp #','+$80
+    beq comma
+    cmp #'['+$80
+    beq opbrack
+    cmp #']'+$80
+    beq clbrack
     cmp #$8A
     bne nextbf
-return:
-    jmp $FF00
+    jmp RESET
+plus:
+    inc TAPE,X
+    jmp nextbf
+minus:
+    dec TAPE,X
+    jmp nextbf
+left:
+    dex
+    jmp nextbf
+right:
+    inx
+    jmp nextbf
+dot:
+    lda TAPE,X
+    jsr ECHO
+    jmp nextbf
+comma:
+    lda KBDCR
+    bpl comma
+    lda KBD
+    sta TAPE,X
+    jmp nextbf
+opbrack:
+    cmp #']'+$80
+clbrack:
+    
     
     
 
