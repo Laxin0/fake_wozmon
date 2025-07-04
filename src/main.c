@@ -58,39 +58,44 @@ void write6502(uint16_t address, uint8_t value){
     memory[address] = value;
 }
 
-void load_prog(){
-    FILE *fptr;
-    fptr = fopen("prog.bin", "rb");
-    fread(memory + 0x1200, 100, 1, fptr);
-}
-
-void read_file(){
+void load_memory(char *file_name){
    FILE *fptr;
-   fptr = fopen("./build/wozmon.bin", "rb");
+   fptr = fopen(file_name, "rb");
    fread(memory, sizeof(memory), 1, fptr);
 }
 
-void save_file(){
+void save_memory(char *file_name){
     FILE *fptr;
-    fptr = fopen("a.out", "wb");
+    fptr = fopen(file_name, "wb");
     fwrite(memory, sizeof(memory), 1, fptr);
 }
 
-int main(){
+int main(int argc, char *argv[]){
+
+    if (argc < 2) {
+        printf("No input file was provided!\n");
+        return 1;
+    }
+    char *input_file = argv[1];
+
     set_nonblocking_input();
-    read_file();
-    //load_prog();
+    
+    load_memory(input_file);
 
     reset6502();
+    
     for(;;){
         step6502();
         usleep(100);
         char ch = getchar();
-        if (ch == 'q'){
-            save_file();
+        switch (ch){
+            case 's': save_memory("build/dump.bin"); break;
+            case 'q': goto finish;
         }
         ungetc(ch, stdin);
     }
+
+finish:
     reset_input_mode();
     return 0;
 }
