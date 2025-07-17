@@ -24,10 +24,13 @@
 
    ; .org $1200
    ; .include "hello.s"
-    
-    .org $1300
-    .include "bf.s"
 
+    .org $1200
+    .include "test.s"
+    .org $1300
+    .include "edit.s"
+    .org $1400
+    .include "view.s"
     .org $FF00
     ;.export RESET
 
@@ -47,7 +50,7 @@ NOTCR:
     INY             ; Advance text index.
     BPL NEXTCHAR    ; Auto ESC if > 127.
 ESCAPE:
-    LDA #'\'+$80    ; "\".
+    LDA #'\\'+$80    ; "\".
     JSR ECHO        ; Output it.
 GETLINE:
     LDA #$8A        ; CR.

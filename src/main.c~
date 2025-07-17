@@ -7,12 +7,10 @@
 #include <fcntl.h>
 
 // 01FF - 0100 Stack
-#define KBD     0xD010 
-#define KBDCR   0xD011 
-#define DSP     0xD012 
-#define DSPCR   0xD013
-#define FSTDIN  0xD000
-#define FSTDOUT 0xD001
+#define KBD   0xD010 
+#define KBDCR 0xD011 
+#define DSP   0xD012 
+#define DSPCR 0xD013 
 
 void set_nonblocking_input() {
     struct termios t;
@@ -38,32 +36,24 @@ static uint8_t memory[1<<16] = {0};
 
 uint8_t read6502(uint16_t address){
     //printf("Read\t %4x from\t %4x\n", memory[address], address);
-    char ch;
-    switch(address){
-        case KBDCR:
-            ch = getchar();
-            if (ch != EOF){
-                ch |= 0x80;
-                memory[KBD] = ch;
-                return ch;
-            }
-            return 0;
-        case DSPCR:
-            return 0;
-        case FSTDIN:
-            ch = getchar();
-            return ch == EOF ? 0b10000000 : ch;
+    if (address == KBDCR){
+        char ch = getchar();
+        if (ch != EOF){
+            ch |= 0x80;
+            memory[KBD] = ch;
+            return ch;
+        }
+        return 0;
+    }else if (address == DSPCR){
+        return 0;
     }
     return memory[address];
 }
 
 void write6502(uint16_t address, uint8_t value){
     //printf("Write\t %4x to\t %4x\n", value, address);
-    switch (address){
-        case DSP:
-        case FSTDOUT:
-            putchar(value & 0b01111111);
-            break;
+    if (address == DSP){
+        putchar(value & 0b01111111);
     }
     memory[address] = value;
 }
@@ -97,12 +87,12 @@ int main(int argc, char *argv[]){
     for(;;){
         step6502();
         usleep(100);
-        //char ch = getchar();
-        //switch (ch){
-        //    case 's': save_memory("build/dump.bin"); break;
-        //    case 'q': goto finish;
-        //}
-        //ungetc(ch, stdin);
+        char ch = getchar();
+        switch (ch){
+            case 's': save_memory("build/dump.bin"); break;
+            case 'q': goto finish;
+        }
+        ungetc(ch, stdin);
     }
 
 finish:

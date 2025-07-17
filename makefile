@@ -1,5 +1,5 @@
 ASM=vasm6502_oldstyle
-ASMFLAGS=-dotdir -Fbin
+ASMFLAGS=-dotdir -Fbin -esc
 
 CC=gcc
 CFLAGS=-Wall -Wextra
