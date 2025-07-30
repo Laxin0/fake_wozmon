@@ -961,6 +961,7 @@ void step6502() {
     instructions++;
 
     if (callexternal) (*loopexternal)();
+    //printf("DEBUG: PC=%04X, SP=%02X, A=%02X, X=%02X, Y=%02X, ST=%08b\n", pc, sp, a, x, y, status);
 }
 
 void hookexternal(void *funcptr) {

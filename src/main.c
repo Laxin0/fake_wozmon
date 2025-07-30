@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <termios.h>
 #include <fcntl.h>
+#include <stdlib.h>
 
 // 01FF - 0100 Stack
 #define KBD     0xD010 
@@ -13,6 +14,8 @@
 #define DSPCR   0xD013
 #define FSTDIN  0xD000
 #define FSTDOUT 0xD001
+#define FHEXOUT 0xD002
+#define FSYS    0xD003
 
 void set_nonblocking_input() {
     struct termios t;
@@ -64,6 +67,13 @@ void write6502(uint16_t address, uint8_t value){
         case FSTDOUT:
             putchar(value & 0b01111111);
             break;
+        case FHEXOUT:
+            printf("%X ", value);
+            break;
+        case FSYS:
+            printf("Exited by writing into SYS\n");
+            reset_input_mode();
+            exit(0);
     }
     memory[address] = value;
 }
@@ -86,6 +96,7 @@ int main(int argc, char *argv[]){
         printf("No input file was provided!\n");
         return 1;
     }
+
     char *input_file = argv[1];
 
     set_nonblocking_input();
