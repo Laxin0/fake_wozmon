@@ -5,6 +5,9 @@ TEMPCOUNT=2
 
 addr=0
 
+echo "    .ifndef REGDEF"
+echo "    REGDEF = 0"
+
 for (( i=1; i<=$REGCOUNT; i++ ))
 do
     echo "    r${i}l = ${addr}"
@@ -20,3 +23,5 @@ do
     echo "    t${i}h = ${addr}"
     addr=$(($addr+1))
 done
+
+echo "    .endif ; REGDEF"

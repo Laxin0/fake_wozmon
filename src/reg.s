@@ -1,3 +1,5 @@
+    .ifndef REGDEF
+    REGDEF = 0
     r1l = 0
     r1h = 1
     r2l = 2
@@ -8,3 +10,4 @@
     t1h = 7
     t2l = 8
     t2h = 9
+    .endif ; REGDEF

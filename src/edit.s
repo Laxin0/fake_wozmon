@@ -1,27 +1,11 @@
-stdin  = $D000 ; I don't know
-stdout = $D001
+    .include "std.s"
 
-left_l  = $10
+    buffstartaddr = $F000
+    buffendaddr   = $FFFF
+    gapstartaddr  = $F000
+    gapendaddr    = $FFFF
 
-    ldx #0
-    lda #$10
-    sta left_l
-    lda #$00
-    sta left_l+1
-
-readchar:
-    lda stdin
-    bmi readchar
+editor:
     
-    sta stdout
-    cmp #'$'
-    beq exitprogram
-    sta (left_l,x)
-    inc left_l
-    bne readchar
-    inc left_l+1
-    jmp readchar
-exitprogram:
-    lda #0
-    sta (left_l,x)
-    jmp $FF00
+
+
