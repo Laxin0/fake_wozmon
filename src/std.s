@@ -6,9 +6,10 @@
     ;.org($200)
 
 start:
-    
-    lda #$00
-    sta r1l
+    ; AY    r1    r2   
+    ; 00 EE 00 FF F0 00
+    lda #$00 
+    sta r1l  
     lda #$FF
     sta r1h
 
@@ -20,7 +21,7 @@ start:
     lda #$00
     ldy #$EE
 
-    jsr memcpy
+    jsr memcpy2
     jmp $FF00
 
     lda #<str
@@ -44,35 +45,31 @@ start:
     lda #1
     sta sys
 
-memcpy:
+memcpy2:
     sta t1l
-    sta t1h
-    ldx #0
-.loop:
+    sty t1h
+    ldy #0
+.yloop:
     lda r2l
     ora r2h
     beq .out
 
-    lda (r1l,x)
-    sta (t1l,x)
-
-    inc t1l
-    bne .skipIncT1h
-    inc t1h
-.skipIncT1h:
-    inc r1l
-    bne .skipIncR1h
-    inc r1h
-.skipIncR1h:
-    
     lda r2l
     bne .skipDec
     dec r2h
 .skipDec
     dec r2l
-    jmp .loop
+
+    lda (r1l),y
+    sta (t1l),y
+    iny
+    bne .yloop
+    inc t1h
+    inc r1h
+    jmp .yloop
 .out:
     rts
+
 
 strcmp:
     sta t1l
@@ -157,7 +154,7 @@ strlen:
     lda t1l ; TODO: Can I rewrite using less instructions and directly using Y?
     sbc t2l
     sta t1l
-    lda t1h
+    lda t1h ;FIXME: check borrowing
     sbc t2h
     sta t1h
     inc t1l
